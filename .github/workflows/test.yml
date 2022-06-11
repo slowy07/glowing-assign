@@ -1,0 +1,12 @@
+name: test-ruby
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    step:
+      - uses: actions/checkout@master
+      - uses: actions/checkout@master
+        with:
+          ruby-version: '3.1'
+      - name: run test
+        run: rake test
