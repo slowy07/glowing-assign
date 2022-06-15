@@ -1,0 +1,25 @@
+name: lua-test
+on: [push, pull_request]
+jobs:
+  check_format:
+    runs-on: ubuntu-latest
+  
+  steps:
+    - uses: action/checkout@v2
+    - uses: JohnnyMorganz/stylua-action@1.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: --check .
+  
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup
+        run: |
+          sudo apt install luarocks -qyy
+          sudo luarocks install luacheck
+      - name: lint
+        run: |
+          luacheck ds
+          luacheck .spec --config ./spec/.luacheckrc
