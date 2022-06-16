@@ -12,4 +12,4 @@ jobs:
       - name: lint
         run: |
           luacheck ds
-          luacheck .spec --config ./spec/.luacheckrc
+          luacheck .spec --config .spec/.luacheckrc
