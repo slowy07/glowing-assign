@@ -1,6 +1,6 @@
 read_globals = {
     "describe",
-    "it"
+    "it",
     assert = {
         fields = {
             truthy = {},
