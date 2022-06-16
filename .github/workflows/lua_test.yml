@@ -1,6 +1,6 @@
 name: lua-test
 on: [push, pull_request]
-jobs:s  
+jobs:  
   lint:
     runs-on: ubuntu-latest
     steps:
