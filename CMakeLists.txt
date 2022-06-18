@@ -40,6 +40,7 @@ endif()
 
 add_subdirectory(conversion)
 add_subdirectory(numerical_methods)
+add_subdirectory(sorting)
 
 cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0057 NEW)

@@ -1,5 +1,4 @@
 file( GLOB APP_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c )
-
 foreach( testsourcefile ${APP_SOURCES} )
     string( REPLACE ".c" "" testname ${testsourcefile} )
     add_executable( ${testname} ${testsourcefile} )
