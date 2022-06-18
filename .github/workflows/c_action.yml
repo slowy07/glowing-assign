@@ -36,7 +36,7 @@ jobs:
         run: |
           git remote -v
           git branch
-          git remove set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git diff --diff-file=dr --name-only origin/main > git_diff.txt
           echo "file changed-- `cat git_diff.txt`"
       - name: configure static link checking
