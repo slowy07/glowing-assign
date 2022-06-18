@@ -7,16 +7,16 @@ end
 
 function median_heap.new(less_than)
     local self
-    self = {
-        less_than = less_than
-        lower_half = heap.new(function(a, b)
-            return self.less_than(a, b)
-        end),
-        upper_half = heap.new(function(a, b)
-            return self.less_than(b, a)
-        end),
-    }
-    return self
+	self = {
+		less_than = less_than,
+		lower_half = heap.new(function(a, b)
+			return self.less_than(b, a) 
+		end),
+		upper_half = heap.new(function(a, b)
+			return self.less_than(a, b) 
+		end),
+	}
+	return self
 end
 
 function median_heap:empty()
