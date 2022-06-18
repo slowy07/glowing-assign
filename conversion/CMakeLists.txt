@@ -9,7 +9,7 @@ foreach( testsourcefile ${APP_SOURCES} )
     endif()
 
     if(MATH_LIBRARY)
-        target_target_link_libraries(${testname} ${MATH_LIBRARY})
+        target_link_libraries(${testname} ${MATH_LIBRARY})
     endif()
     install(TARGETS ${testname} DESTINATION "bin/conversion")
 
