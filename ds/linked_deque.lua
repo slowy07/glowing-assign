@@ -22,13 +22,32 @@ end
 function linked_deque:push_head(value)
     assert(value ~= nil)
     local next = self.head
-    if self.head = self.tail then
-        self.head, self.tail = nil, nil
+    self.head = { value = value, next = next }
+    if next then
+        next.previous = self.head
     else
-        self.head = self.head.next
-        self.head.previous = nil
+        self.tail = self.head
     end
-    return value
+end
+
+function linked_deque:get_head()
+	if self.head then
+		return self.head.value
+	end
+end
+
+function linked_deque:pop_head()
+	if self:empty() then
+		return
+	end
+	local value = self.head.value
+	if self.head == self.tail then
+		self.head, self.tail = nil, nil
+	else
+		self.head = self.head.next
+		self.head.previous = nil
+	end
+	return value
 end
 
 function linked_deque:push_tail(value)
