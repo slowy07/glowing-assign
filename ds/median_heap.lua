@@ -10,10 +10,10 @@ function median_heap.new(less_than)
 	self = {
 		less_than = less_than,
 		lower_half = heap.new(function(a, b)
-			return self.less_than(b, a) 
+			return self.less_than(b, a)
 		end),
 		upper_half = heap.new(function(a, b)
-			return self.less_than(a, b) 
+			return self.less_than(a, b)
 		end),
 	}
 	return self
@@ -50,7 +50,7 @@ function median_heap:push(value)
     else
         self.upper_half:push(value)
         if #self.lower_half < #self.upper_half then
-            self.lower_half:push(self.upper_half:pop()) 
+            self.lower_half:push(self.upper_half:pop())
         end
     end
 end
