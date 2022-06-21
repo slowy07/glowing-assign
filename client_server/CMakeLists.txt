@@ -1,0 +1,28 @@
+if(WIN32)
+    check_include_file(winsock32.h WINSOCK_HEADER)
+else()
+    check_include_file(arpa/internet.h ARPA_HEADERS)
+endif()
+
+if(ARPA_HEADERS OR WINSOCK_HEADER)
+    file( GLOB APP_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c )
+    foreach( testsourcefile ${APP_SOURCES} )
+        string( REPLACE ".c" "" testname ${testsourcefile} )
+        add_executable( ${testname} ${testsourcefile} )
+        
+        if (OpenMP_C_FOUND)
+            target_link_libraries(${testname} PRIVATE OpenMP::OpenMP_C)
+        endif()
+        if(MATH_LIBRARY)
+            target_link_libraries(${testnme} PRIVATE ${MATH_LIBRARY})
+        endif()
+
+        if (WINSOCK_HEADER)
+            target_link_libraries(${testname} PRIVATE ws2_32)
+        endif()
+
+        install(TARGETS ${testname} DESTINATION "bin/client_server")
+    endforeach( testsourcefile ${APP_SOURCES} )
+else()
+    message(WARNING "socket headers not found in sytem.")
+endif(ARPA_HEADERS OR WINSOCK_HEADER)
