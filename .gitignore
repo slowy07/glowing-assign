@@ -2,3 +2,25 @@
 /**/*.out
 /**/*.class
 .vscode
+.vscode/
+
+# julia
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+
+# build artifacts
+deps/deps.jl
+deps/build.log
+deps/downloads/
+deps/usr/
+deps/src/
+
+docs/build/
+docs/site/
+docs/Manifest.toml
+
+Manifest.toml
+
+
