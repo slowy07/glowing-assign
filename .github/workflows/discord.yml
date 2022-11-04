@@ -1,0 +1,14 @@
+name: Discord notifications
+
+on: [push, pull_request_target]
+
+jobs:
+  notify_discord:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: 'project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed. sender: {{ EVENT_PAYLOAD.head_commit.author.name }} - {{ EVENT_PAYLOAD.head_commit.committer.email }}, information update: {{ EVENT_PAYLOAD.repository.updated_at }}'
