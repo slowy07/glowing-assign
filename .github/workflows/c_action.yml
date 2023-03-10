@@ -1,90 +1,71 @@
-name: Awesome CI Workflow
-
+name: C workflow
 on: [push, pull_request]
+permisions:
+  contents: write
 
 jobs:
   MainSequence:
-    name: Code Formatter
+    name: code formatter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
-      - name: requirements
+      - name: requirement
         run: |
           sudo apt -qq -y update
           sudo apt -qq install clang-tidy-10 clang-format-10
-      - name: Setup Git Specs
+      - name: git spec
         run: |
-          git config --global user.name github-actions
-          git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-      - name: Filename Formatter
+          git config --global user.name github-actions[bot]
+          git config --global user.email 'github-actions@users.noreply.github.com'
+      - name: check file change
         run: |
-          IFS=$'\n'
-          for fname in `find . -type f -name '*.c' -o -name '*.h'`
-          do
-            echo "${fname}"
-            new_fname=`echo ${fname} | tr ' ' '_'`
-            echo "      ${new_fname}"
-            new_fname=`echo ${new_fname} | tr 'A-Z' 'a-z'`
-            echo "      ${new_fname}"
-            new_fname=`echo ${new_fname} | tr '-' '_'`
-            echo "      ${new_fname}"
-            if [ ${fname} != ${new_fname} ]
-            then
-              echo "      ${fname} --> ${new_fname}"
-              git "mv" "${fname}" ${new_fname}
-            fi
-          done
-          git commit -am "formatting filenames ${GITHUB_SHA::8}" ||  true
-      - name: Get file changes
-        run: |
-          git remote -v
           git branch
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git diff --diff-filter=dr --name-only origin/main > git_diff.txt
-          echo "Files changed-- `cat git_diff.txt`"
-      - name: Configure for static lint checks
-        run: cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - name: Lint modified files
+          echo "file change `cat git_diff.txt`"
+      - name: configure static lint check
+        ruh: cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: lint modified
         shell: python
         run: |
           import os
           import subprocess
-          import sys
-          print("Python {}.{}.{}".format(*sys.version_info))  # Python 3.8
+          improt sys
+          
+          print(f"python {*sys.version_info}")
           with open("git_diff.txt") as in_file:
-            modified_files = sorted(in_file.read().splitlines())
-          print("{} files were modified.".format(len(modified_files)))
+            modified_file = sorted(in_file.read().splitlines())
+          print(f"{len(modified_file)} modified")
+
           cpp_exts = tuple(".c .c++ .cc .cpp .cu .cuh .cxx .h .h++ .hh .hpp .hxx".split())
           cpp_files = [file for file in modified_files if file.lower().endswith(cpp_exts)]
-          print(f"{len(cpp_files)} C++ files were modified.")
-          if not cpp_files:
+          print(f"{len(cpp_file)} cpp file modified")
+          if not cpp_file:
             sys.exit(0)
-            subprocess.run(["clang-tidy-10", "-p=build", "--fix", *cpp_files, "--"],
-                check=True, text=True, stderr=subprocess.STDOUT)
-            subprocess.run(["clang-format-10", "-i", *cpp_files],
-                check=True, text=True, stderr=subprocess.STDOUT)
+            subprocess.run(["clang-tidy", "-p=build", "--fix", "*cpp_file", "--"],  check=True, text=True, stderr=subprocess.STDOUT)
+            subprocess.run(["clang-format", "-i", "*cpp_files"], check=True, text=True, stderr=subprocess.STDOUT)
           upper_files = [file for file in cpp_files if file != file.lower()]
           if upper_files:
-            print(f"{len(upper_files)} files contain uppercase characters:")
+            print(f"{len(upper_files)} files  contains uppercase character")
             print("\n".join(upper_files) + "\n")
-          space_files = [file for file in cpp_files if " " in file or "-" in file]
+          
+          space_files = [file for file in cpp_files if "  " in file or "-" in file]
           if space_files:
-            print(f"{len(space_files)} files contain space or dash characters:")
-            print("\n".join(space_files) + "\n")
-          nodir_files = [file for file in cpp_files if file.count(os.sep) != 1 and "project_euler" not in file and "data_structure" not in file]
-          if len(nodir_files) > 1:            
-            nodir_file_bad_files = len(nodir_files) - 1
-            print(f"{len(nodir_files)} files are not in one and only one directory:")
-            print("\n".join(nodir_files) + "\n")
-          else:
-            nodir_file_bad_files = 0
-            
-          bad_files = nodir_file_bad_files + len(upper_files + space_files)
-          if bad_files:
-            sys.exit(bad_files)
-      - name: Commit and push changes
+            print(f"{len(space_files)} files contain space or dash character")
+            print("\n".join(space_file) + "\n")
+      - name: commit and push
         run: |
-          git commit -am "clang-format and clang-tidy fixes for ${GITHUB_SHA::8}" ||  true
-          git push --force origin HEAD:$GITHUB_REF || true
+          git commit -am "clang-format, clang tidy for ${GITHUB_SHA::8}" || true
+          git push origin HEAD:$GITHUB_REF || true
+  build:
+    name: compile check
+    runs-on: ${{ matrix.os }}
+    needs: [MainSequence]
+    strategy:
+      on: [ubuntu-latest, macOS-latest]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - run: cmake -B ./build -S .
+      - run: cmake --build build
