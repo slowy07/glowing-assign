@@ -1,4 +1,4 @@
-name: C workflow
+name: C workfloww
 on: [push, pull_request]
 permissions:
   contents: write
@@ -55,7 +55,6 @@ jobs:
             print("\n".join(space_files) + "\n")
       - name: Commit and push changes
         run: |
-          git diff DIRECTORY.md
           git commit -am "clang-format and clang-tidy fixes for ${GITHUB_SHA::8}" || true
           git push origin HEAD:$GITHUB_REF || true
   build:
