@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
       - name: requirement
         run: |
           sudo apt -qq -y update
@@ -62,7 +64,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [MainSequence]
     strategy:
-      on: [ubuntu-latest, macOS-latest]
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v3
         with:
