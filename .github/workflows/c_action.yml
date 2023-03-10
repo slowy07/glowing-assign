@@ -19,7 +19,8 @@ jobs:
       - name: Setup Git Specs
         run: |
           git config --global user.name github-actions[bot]
-          git config --global user.email 'github-actions@users.noreply.github.com'      - name: Get file changes
+          git config --global user.email 'github-actions@users.noreply.github.com'      
+      - name: Get file changes
         run: |
           git branch
           git diff --diff-filter=dr --name-only origin/main > git_diff.txt
