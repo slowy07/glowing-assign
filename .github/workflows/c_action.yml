@@ -5,62 +5,61 @@ permissions:
 
 jobs:
   MainSequence:
-    name: code formatter
+    name: Code Formatter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v4
-      - name: requirement
+      - name: requirements
         run: |
-          sudo apt -qq -y update
-          sudo apt -qq install clang-tidy-10 clang-format-10
-      - name: git spec
+          sudo apt-get -qq update
+          sudo apt-get -qq install clang-tidy clang-format
+      - name: Setup Git Specs
         run: |
           git config --global user.name github-actions[bot]
-          git config --global user.email 'github-actions@users.noreply.github.com'
-      - name: check file change
+          git config --global user.email 'github-actions@users.noreply.github.com'      - name: Get file changes
         run: |
           git branch
           git diff --diff-filter=dr --name-only origin/main > git_diff.txt
-          echo "file change `cat git_diff.txt`"
-      - name: configure static lint check
-        ruh: cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - name: lint modified
+          echo "Files changed-- `cat git_diff.txt`"
+      - name: Configure for static lint checks
+        run: cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Lint modified files
         shell: python
         run: |
           import os
           import subprocess
-          improt sys
-          
-          print(f"python {*sys.version_info}")
+          import sys
+          print("Python {}.{}.{}".format(*sys.version_info))  # Python 3.8
           with open("git_diff.txt") as in_file:
-            modified_file = sorted(in_file.read().splitlines())
-          print(f"{len(modified_file)} modified")
-
+            modified_files = sorted(in_file.read().splitlines())
+          print("{} files were modified.".format(len(modified_files)))
           cpp_exts = tuple(".c .c++ .cc .cpp .cu .cuh .cxx .h .h++ .hh .hpp .hxx".split())
           cpp_files = [file for file in modified_files if file.lower().endswith(cpp_exts)]
-          print(f"{len(cpp_file)} cpp file modified")
-          if not cpp_file:
+          print(f"{len(cpp_files)} C++ files were modified.")
+          if not cpp_files:
             sys.exit(0)
-            subprocess.run(["clang-tidy", "-p=build", "--fix", "*cpp_file", "--"],  check=True, text=True, stderr=subprocess.STDOUT)
-            subprocess.run(["clang-format", "-i", "*cpp_files"], check=True, text=True, stderr=subprocess.STDOUT)
+            subprocess.run(["clang-tidy", "-p=build", "--fix", *cpp_files, "--"],
+                check=True, text=True, stderr=subprocess.STDOUT)
+            subprocess.run(["clang-format", "-i", *cpp_files],
+                check=True, text=True, stderr=subprocess.STDOUT)
           upper_files = [file for file in cpp_files if file != file.lower()]
           if upper_files:
-            print(f"{len(upper_files)} files  contains uppercase character")
+            print(f"{len(upper_files)} files contain uppercase characters:")
             print("\n".join(upper_files) + "\n")
-          
-          space_files = [file for file in cpp_files if "  " in file or "-" in file]
+          space_files = [file for file in cpp_files if " " in file or "-" in file]
           if space_files:
-            print(f"{len(space_files)} files contain space or dash character")
-            print("\n".join(space_file) + "\n")
-      - name: commit and push
+            print(f"{len(space_files)} files contain space or dash characters:")
+            print("\n".join(space_files) + "\n")
+      - name: Commit and push changes
         run: |
-          git commit -am "clang-format, clang tidy for ${GITHUB_SHA::8}" || true
+          git diff DIRECTORY.md
+          git commit -am "clang-format and clang-tidy fixes for ${GITHUB_SHA::8}" || true
           git push origin HEAD:$GITHUB_REF || true
   build:
-    name: compile check
+    name: Compile checks
     runs-on: ${{ matrix.os }}
     needs: [MainSequence]
     strategy:
