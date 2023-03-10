@@ -1,6 +1,6 @@
 name: C workflow
 on: [push, pull_request]
-permisions:
+permissions:
   contents: write
 
 jobs:
