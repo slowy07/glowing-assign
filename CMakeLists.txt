@@ -5,8 +5,12 @@ project(C_assign
     DESCRIPTION "my glowing assign"
 )
 
-set(CMKE_C_STANDARD 11)
-set(CMKE_C_STANDARD_REQUIRED YES)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED YES)
+
+include(CheckIncludeFile)
+include(CheckSymbolExists)
+SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} stdbool.h, inttypes.h, complex.h)
 
 if(MSVC)
     add_compile_definition(_CRT_SECURE_NO_WARNINGS)
@@ -23,8 +27,6 @@ if(USE_OPENMP)
     endif()
 endif()
 
-include(CheckIncludeFile)
-include(CheckSymbolExists)
 check_include_file(stdbool.h HAS_STDBOOL_H)
 check_include_file(inttypes.h HAS_INTTYPES_H)
 check_include_file(complex.h HAS_COMPLEX_H)
